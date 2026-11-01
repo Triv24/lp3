@@ -51,31 +51,6 @@ class Tree:
         self.generate_codes(node.left, code + "0")
         self.generate_codes(node.right, code + "1")
 
-    def print_tree(self, node=None, prefix="", is_left=True):
-        if self.root is None:
-            print("Tree is empty.")
-            return
-        if node is None:
-            node = self.root
-        if node.char is not None:
-            print(prefix + ("|-- " if is_left else "`-- ")
-                  + repr(node.char) + " (" + str(node.freq) + ")")
-        else:
-            print(prefix + ("|-- " if is_left else "`-- ")
-                  + "* (" + str(node.freq) + ")")
-        if node.left:
-            self.print_tree(
-                node.left,
-                prefix + ("|   " if is_left else "    "),
-                True
-            )
-        if node.right:
-            self.print_tree(
-                node.right,
-                prefix + ("|   " if is_left else "    "),
-                False
-            )
-
     def encode_str(self, string):
         encoded = ""
         for char in string:
@@ -101,9 +76,9 @@ class Tree:
 
 text = input("Enter a string: ")
 huffman = Tree()
+
 huffman.BuildTree(text)
-print("\nHuffman Tree:")
-huffman.print_tree()
+
 print("\nHuffman Codes:")
 for char, code in huffman.codes.items():
     print(repr(char), ":", code)
