@@ -5,7 +5,8 @@ def fib(n):
     return 1
   else :
     return fib(n-1) + fib(n-2)
+    
 
 num = int(input("Enter the number : "))
-
-fib(num)
+for i in range(num) :
+  print(fib(i))
