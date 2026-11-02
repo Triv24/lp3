@@ -145,7 +145,7 @@ plt.show()
 
 
 
-
+"""
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ====================================================================
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1230,3 +1230,4 @@ Finally, I evaluated and compared both models using R² score, MAE and RMSE, and
 **Most important blocks to revise:** 5 (Haversine), 6 (IQR), 8 (Train-Test Split), 9 (Linear Regression), 10 (Random Forest), and 11 (Evaluation).
 
 Remember: Be able to explain why each algorithm is used, not just what its Python function does.
+"""
