@@ -1,0 +1,343 @@
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract StudentData{
+    struct Student{
+        uint rollNo;
+        uint age;
+        string name;
+        uint marks;
+        
+    }
+
+    Student[] public students;
+
+    //Add Student
+    function addStudent( uint _rollNo, uint _age, string memory _name, uint _marks)public{
+        students.push(Student(_rollNo,_age,_name,_marks));
+    }
+
+    //Get Student
+    function getStudent(uint index)public view returns(uint, string memory, uint){
+        require (index<students.length,"Invalid ID");
+        Student memory s = students[index];
+        return (s.rollNo,s.name, s.marks);
+    }
+
+    //Get Student Count
+    function getCount()public view returns(uint) {
+        return students.length;
+    }
+
+    fallback() external payable {
+        require(msg.value>0,"Ether must be greater than 0");
+    }
+    receive() external payable {
+     require(msg.value > 0, "Ether must be greater than 0");
+    }
+}
+
+
+#=================================================================
+## 3. CODE EXPLANATION
+
+### 1. SPDX License and Solidity Version
+
+- `SPDX-License-Identifier: MIT` specifies the license of the source code.
+- `pragma solidity ^0.8.20` specifies the compatible Solidity compiler version.
+
+### 2. Contract Declaration
+
+- `contract StudentData` creates a smart contract named StudentData.
+
+### 3. Structure (Struct)
+
+```solidity
+struct Student {
+    uint rollNo;
+    uint age;
+    string name;
+    uint marks;
+}
+```
+
+- A struct is a user-defined data type.
+- It groups multiple variables of different data types into one unit.
+- Here, it stores four student details:
+  - `rollNo`: Student roll number.
+  - `age`: Student age.
+  - `name`: Student name.
+  - `marks`: Student marks.
+
+### 4. Dynamic Array
+
+```solidity
+Student[] public students;
+```
+
+- Creates a dynamic array of Student structures.
+- It stores multiple student records.
+- `public` automatically creates a getter function to access individual array elements.
+- The array can grow whenever a new student is added.
+
+### 5. Add Student Function
+
+```solidity
+function addStudent(
+    uint _rollNo,
+    uint _age,
+    string memory _name,
+    uint _marks
+) public {
+    students.push(Student(_rollNo, _age, _name, _marks));
+}
+```
+
+- Used to add a new student's information.
+- Takes four parameters: roll number, age, name and marks.
+- `memory` temporarily stores the string during function execution.
+- `students.push()` adds a new Student structure to the array.
+- Every new student is stored at the next available index.
+
+### 6. Get Student Function
+
+```solidity
+function getStudent(uint index)
+    public
+    view
+    returns (uint, string memory, uint)
+{
+    require(index < students.length, "Invalid ID");
+
+    Student memory s = students[index];
+
+    return (s.rollNo, s.name, s.marks);
+}
+```
+
+- Used to retrieve student details using the array index.
+- `index` specifies the student's position in the array.
+- `view` means the function reads data without modifying it.
+- `require()` checks whether the index is valid.
+- `Student memory s` temporarily stores the selected student's details.
+- Returns roll number, name and marks.
+
+**Important:** The original function does not return age, even though age is stored in the struct.
+
+### 7. Get Student Count Function
+
+```solidity
+function getCount() public view returns (uint) {
+    return students.length;
+}
+```
+
+- Returns the total number of students stored in the array.
+- `students.length` gives the current array size.
+- `view` is used because the function only reads data.
+
+### 8. Receive Function
+
+```solidity
+receive() external payable {
+    require(msg.value > 0, "Ether must be greater than 0");
+}
+```
+
+- `receive()` is a special Solidity function.
+- It is automatically executed when the contract receives Ether with empty transaction data.
+- `external` means it can be called from outside the contract.
+- `payable` allows the contract to receive Ether.
+- `msg.value` represents the amount of Ether sent in Wei.
+- `require()` prevents receiving zero Ether.
+
+### 9. Fallback Function
+
+```solidity
+fallback() external payable {
+    require(msg.value > 0, "Ether must be greater than 0");
+}
+```
+
+- `fallback()` is a special function executed when a call does not match any existing function.
+- It can also execute when transaction data is empty if no receive function exists.
+- Here, it is payable, so it can receive Ether.
+- `require()` checks that the received Ether is greater than zero.
+
+**Difference between receive() and fallback():**
+
+| receive() | fallback() |
+|---|---|
+| Executes when calldata is empty | Executes when no function matches the calldata |
+| Must be payable to receive Ether | Can be payable or non-payable |
+| Used for plain Ether transfers | Used for unmatched calls and potentially Ether transfers |
+| Has no parameters | Has no parameters |
+
+## 4. IMPORTANT SOLIDITY CONCEPTS
+
+| Concept | Meaning |
+|---|---|
+| Struct | User-defined data type |
+| Dynamic Array | Array whose size can grow |
+| push() | Adds an element to an array |
+| memory | Temporary data storage |
+| storage | Persistent contract data storage |
+| public | Accessible externally and internally |
+| external | Called from outside the contract |
+| payable | Allows receiving Ether |
+| view | Reads data without modifying state |
+| require() | Checks a condition |
+| receive() | Handles Ether transfers with empty calldata |
+| fallback() | Handles unmatched function calls |
+| msg.value | Amount of Ether received in Wei |
+
+## 5. VIVA QUESTIONS AND ANSWERS
+
+**Q1. What is a smart contract?**
+
+A smart contract is a program deployed on a blockchain that executes according to predefined rules.
+
+**Q2. What is the purpose of the StudentData contract?**
+
+It stores student details, adds new students, retrieves student information, counts students and receives Ether.
+
+**Q3. What is a struct in Solidity?**
+
+A struct is a user-defined data type that groups multiple variables of different data types.
+
+**Q4. Why is struct used in this program?**
+
+It groups roll number, age, name and marks into one Student record.
+
+**Q5. What is a dynamic array?**
+
+A dynamic array is an array whose size can increase or decrease during execution.
+
+**Q6. Why is students[] declared public?**
+
+To allow external access to individual student records through an automatically generated getter.
+
+**Q7. What is push() in Solidity?**
+
+The push() function adds a new element to the end of a dynamic array.
+
+**Q8. What is memory in Solidity?**
+
+Memory is temporary data storage used during function execution.
+
+**Q9. What is the difference between memory and storage?**
+
+- Memory: Temporary data storage during function execution.
+- Storage: Persistent data stored on the blockchain.
+
+**Q10. What is the purpose of addStudent()?**
+
+It adds a new student's details to the students array.
+
+**Q11. What is the purpose of getStudent()?**
+
+It retrieves student details using the array index.
+
+**Q12. Why is require() used in getStudent()?**
+
+It checks whether the given index is valid. If the index is invalid, the transaction or call reverts with an error.
+
+**Q13. What is students.length?**
+
+It returns the total number of student records in the array.
+
+**Q14. What is the purpose of getCount()?**
+
+It returns the total number of students stored in the contract.
+
+**Q15. What is receive() in Solidity?**
+
+It is a special function that executes when Ether is sent to the contract with empty transaction data.
+
+**Q16. What is fallback() in Solidity?**
+
+It is a special function that executes when a call does not match any existing function.
+
+**Q17. What is the difference between receive() and fallback()?**
+
+Receive handles empty calldata, while fallback handles unmatched function calls.
+
+**Q18. Why is payable used?**
+
+It allows a function to receive Ether.
+
+**Q19. What is msg.value?**
+
+It represents the amount of Ether sent with the transaction in Wei.
+
+**Q20. What happens if an invalid student index is entered?**
+
+The require condition fails and the call reverts with "Invalid ID".
+
+**Q21. Can a struct contain different data types?**
+
+Yes. A struct can contain multiple variables of different data types.
+
+**Q22. Does getStudent() return all four student details?**
+
+No. It returns only roll number, name and marks. Age is stored but not returned.
+
+**Q23. What is Remix IDE?**
+
+Remix is an online IDE used to write, compile, deploy and test Solidity smart contracts.
+
+**Q24. What is MetaMask?**
+
+MetaMask is a cryptocurrency wallet used to connect to blockchain networks and approve transactions.
+
+**Q25. What is Sepolia?**
+
+Sepolia is an Ethereum test network used to test smart contracts using test ETH.
+
+## 6. ONE-MINUTE EXPLANATION TO THE EXAMINER
+
+Good morning. My practical is to develop a Student Data Management smart contract using Solidity.
+
+In this contract, I have used a struct to store four student details: roll number, age, name and marks.
+
+I have created a dynamic array named students to store multiple student records.
+
+The contract contains three main functions. The addStudent() function adds a new student's details to the array using push(). The getStudent() function retrieves student details using an index and checks whether the index is valid using require(). The getCount() function returns the total number of students.
+
+I have also implemented receive() and fallback() functions to handle Ether transfers. The receive function handles transfers with empty transaction data, while fallback handles unmatched function calls.
+
+Finally, I compiled and deployed the contract using Remix IDE with MetaMask on the Sepolia test network and tested the different functions.
+
+## 7. QUICK REVISION
+
+| Topic | Answer |
+|---|---|
+| Contract Name | StudentData |
+| Solidity Version | ^0.8.20 |
+| Data Structure | Struct |
+| Array Type | Dynamic Array |
+| Array Name | students |
+| Add Function | addStudent() |
+| Retrieve Function | getStudent() |
+| Count Function | getCount() |
+| Add Array Element | push() |
+| Array Size | length |
+| Temporary Storage | memory |
+| Persistent Storage | storage |
+| Ether Receiving | receive() |
+| Unmatched Calls | fallback() |
+| Ether Amount | msg.value |
+| Validation | require() |
+| Test Network | Sepolia |
+| IDE | Remix |
+| Wallet | MetaMask |
+
+## 8. IMPORTANT NOTES
+
+1. The original code contained typing errors. The corrected code uses `students.push(Student(_rollNo, _age, _name, _marks));`.
+2. The original getStudent() function returns only roll number, name and marks. It does not return age.
+3. Array indexing starts from 0, not 1. Therefore, the first student is at index 0.
+4. The public students array automatically provides a getter for individual records.
+5. The receive() and fallback() functions can accept Ether, but this contract does not provide a withdrawal function.
+6. The contract is an educational example and is not a complete student management system.
+7. Never include wallet passwords, private keys or Secret Recovery Phrases in practical files.

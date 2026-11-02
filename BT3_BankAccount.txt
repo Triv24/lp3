@@ -1,0 +1,251 @@
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract BankAccount{
+    //mapping line, D,W,S:
+    mapping(address => uint256) private balances;
+
+    //Deposit Ether:
+    function deposit() public payable{
+        require(msg.value>0, "Deposit must be greater than 0");
+        balances[msg.sender] += msg.value;
+    }
+
+    //Withdraw Ether:
+    function withdraw(uint256 amount) public {
+        require(amount>0, "Amount must be greater than 0");
+        require(balances[msg.sender]>=amount, "Insufficient Balance");
+        balances[msg.sender]-=amount;
+        (bool success,) = payable(msg.sender).call{value:amount}("");
+
+        require(success, "Transfer Fialed");
+    }
+    //Show Balance:
+    function displayBalance() public view returns(uint256){
+        return balances[msg.sender];
+    }
+}
+
+
+
+==================
+
+
+
+/**
+ * QUESTION 3 (BT): Smart contract for a bank account.
+ *
+ * HOW IT WORKS
+ *   Each address that calls deposit() gets its own balance in the
+ *   `balances` mapping. Deposits are payable: the ETH sent with the
+ *   transaction is credited to msg.sender. withdraw() checks the caller's
+ *   balance, updates state BEFORE sending ETH (checks-effects-interactions
+ *   pattern, so re-entrancy cannot drain the contract), then transfers the
+ *   money with a low-level call and verifies it succeeded. The owner can
+ *   hand over the contract with transferOwnership().
+ *
+ * COMPLEXITY / COST
+ *   deposit        : O(1) time, ~45k gas (one fresh storage slot)
+ *   withdraw       : O(1) time, ~30k gas + 2300 gas stipend for the receiver
+ *   balanceOf      : O(1), free when called with eth_call (view function)
+ *
+ * NOTES / INFO
+ *   - Never use tx.origin for authorisation; use msg.sender.
+ *   - Update balances before the external call to prevent re-entrancy.
+ *   - This is a teaching contract: it holds real ETH on a testnet only.
+ *     A production bank would additionally use access control roles,
+ *     upgradeable proxies, interest accounting and off-chain KYC.
+ */
+
+
+======================
+## 3. CODE EXPLANATION
+
+### 1. SPDX License and Solidity Version
+- `SPDX-License-Identifier: MIT` specifies the license.
+- `pragma solidity ^0.8.20` specifies the compatible Solidity compiler version.
+
+### 2. Contract Declaration
+- `contract BankAccount` creates a smart contract named BankAccount.
+
+### 3. Mapping
+- `mapping(address => uint256) private balances;`
+- Mapping stores data in key-value pairs.
+- Address is the key, and the user's balance is the value.
+- Each wallet address has a separate balance.
+- `private` restricts direct access through the automatically generated getter.
+
+### 4. Deposit Function
+- `public`: Function can be called externally.
+- `payable`: Allows the function to receive Ether.
+- `msg.value`: Amount of Ether sent with the transaction, in Wei.
+- `msg.sender`: Address of the person calling the function.
+- `require()`: Checks whether the deposit amount is greater than zero.
+- The deposited amount is added to the user's balance.
+
+### 5. Withdraw Function
+- `uint256 amount`: Amount to withdraw, specified in Wei.
+- First `require()` checks that the withdrawal amount is greater than zero.
+- Second `require()` checks whether the user has sufficient balance.
+- `balances[msg.sender] -= amount` reduces the user's balance before transferring Ether.
+- `payable(msg.sender)` converts the caller's address into a payable address.
+- `call{value:amount}("")` transfers Ether to the caller.
+- `success` stores whether the transfer succeeded.
+- Final `require()` checks whether the transfer was successful.
+
+**Security Concept: Checks-Effects-Interactions**
+1. Checks: Validate the amount and available balance.
+2. Effects: Update the stored balance.
+3. Interactions: Transfer Ether to the external address.
+
+Updating the balance before the external call helps prevent re-entrancy attacks.
+
+### 6. Display Balance Function
+- `view`: Reads contract data without modifying it.
+- `returns(uint256)`: Returns an unsigned integer.
+- `balances[msg.sender]`: Returns the balance of the caller.
+- A normal read-only call does not require a paid transaction.
+
+## 4. IMPORTANT CONCEPTS
+
+| Concept | Meaning |
+|---|---|
+| Mapping | Stores key-value pairs |
+| Address | Ethereum wallet address |
+| uint256 | Unsigned 256-bit integer |
+| Payable | Allows receiving Ether |
+| msg.sender | Address of the caller |
+| msg.value | Amount of Ether sent |
+| require() | Checks a condition |
+| view | Reads data without modifying it |
+| call() | Performs a low-level external call |
+| Wei | Smallest unit of Ether |
+
+**Unit Conversion:**
+
+1 Ether = 10^18 Wei
+
+## 5. VIVA QUESTIONS AND ANSWERS
+
+**Q1. What is a smart contract?**
+
+A smart contract is a program deployed on a blockchain that executes according to predefined rules.
+
+**Q2. What is the purpose of this BankAccount contract?**
+
+It allows users to deposit Ether, withdraw Ether and check their account balance.
+
+**Q3. What is mapping in Solidity?**
+
+A mapping stores data in key-value pairs. Here, the wallet address is the key and the balance is the value.
+
+**Q4. Why is payable used in deposit()?**
+
+It allows the function to receive Ether.
+
+**Q5. What is msg.sender?**
+
+It represents the address of the person who called the current function.
+
+**Q6. What is msg.value?**
+
+It represents the amount of Ether sent with the transaction in Wei.
+
+**Q7. What is Wei?**
+
+Wei is the smallest unit of Ether. One Ether equals 10^18 Wei.
+
+**Q8. Why is require() used?**
+
+It checks conditions and reverts the transaction if a condition is false.
+
+**Q9. Why is mapping private?**
+
+It prevents direct access through Solidity's automatically generated public getter.
+
+**Q10. Why is the balance reduced before sending Ether?**
+
+It follows the Checks-Effects-Interactions pattern and helps prevent re-entrancy attacks.
+
+**Q11. What is re-entrancy?**
+
+It is an attack in which an external contract calls back into a vulnerable contract before the original operation finishes.
+
+**Q12. What does call() do?**
+
+It performs a low-level external call. Here, it is used to transfer Ether.
+
+**Q13. What does the success variable represent?**
+
+It indicates whether the low-level call succeeded.
+
+**Q14. Why is displayBalance() marked view?**
+
+Because it reads contract data without modifying the blockchain state.
+
+**Q15. Does displayBalance() require gas?**
+
+A normal read-only call does not require a paid transaction.
+
+**Q16. What is Remix IDE?**
+
+Remix is an online IDE used to write, compile, deploy and test Solidity smart contracts.
+
+**Q17. What is MetaMask?**
+
+MetaMask is a cryptocurrency wallet used to connect to blockchain networks and approve transactions.
+
+**Q18. What is Sepolia?**
+
+Sepolia is an Ethereum test network used to test smart contracts using test ETH.
+
+**Q19. What happens if a user withdraws more than their balance?**
+
+The transaction reverts with the error "Insufficient Balance".
+
+**Q20. Does this contract have an owner?**
+
+No. The given code does not contain an owner variable or ownership-transfer function.
+
+## 6. ONE-MINUTE EXPLANATION TO THE EXAMINER
+
+Good morning. My practical is to develop a Bank Account smart contract using Solidity.
+
+The contract uses a mapping to store the Ether balance of each user's wallet address. It has three main functions: deposit(), withdraw() and displayBalance().
+
+The deposit function is payable, so users can send Ether. The amount is added to their balance using msg.value and msg.sender.
+
+The withdraw function first checks whether the amount is greater than zero and whether the user has sufficient balance. It then updates the balance before transferring Ether using call(). This follows the Checks-Effects-Interactions pattern and helps prevent re-entrancy attacks.
+
+The displayBalance function is a view function that returns the caller's balance in Wei.
+
+Finally, I compiled the contract in Remix IDE, connected MetaMask to the Sepolia test network, deployed the contract and tested deposit, balance and withdrawal operations.
+
+## 7. QUICK REVISION
+
+| Topic | Answer |
+|---|---|
+| Contract Name | BankAccount |
+| Solidity Version | ^0.8.20 |
+| Data Structure | Mapping |
+| Mapping Key | address |
+| Mapping Value | uint256 |
+| Deposit Function | payable |
+| Sender Address | msg.sender |
+| Deposited Amount | msg.value |
+| Withdrawal Transfer | call() |
+| Validation | require() |
+| Balance Function | view |
+| Ether to Wei | 10^18 |
+| Security Pattern | Checks-Effects-Interactions |
+| Test Network | Sepolia |
+| IDE | Remix |
+| Wallet | MetaMask |
+
+## 8. IMPORTANT NOTE
+
+The original code does not contain an owner variable or transferOwnership() function, even though the introductory comment mentioned them.
+
+Also, `call()` does not impose a 2300-gas stipend. The original code uses a low-level call to transfer Ether.
+
+Never include wallet passwords, private keys or Secret Recovery Phrases in practical files.
